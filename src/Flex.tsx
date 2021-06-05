@@ -234,8 +234,6 @@ export function Flex({
   }, [children, flexProps, requestReflow])
 
   // Common variables for reflow
-  const boundingBox = useMemo(() => new Box3(), [])
-  const vec = useMemo(() => new Vector3(), [])
   const mainAxis = plane[0] as Axis
   const crossAxis = plane[1] as Axis
   const depthAxis = getDepthAxis(plane)
@@ -261,22 +259,6 @@ export function Flex({
 
   // Handles the reflow procedure
   function reflow() {
-    // Recalc all the sizes
-    boxesRef.current.forEach(({ group, node, flexProps }) => {
-      const scaledWidth = typeof flexProps.width === 'number' ? flexProps.width * scaleFactor : flexProps.width
-      const scaledHeight = typeof flexProps.height === 'number' ? flexProps.height * scaleFactor : flexProps.height
-
-      if (scaledWidth !== undefined && scaledHeight !== undefined) {
-        // Forced size, no need to calculate bounding box
-        node.setWidth(scaledWidth)
-        node.setHeight(scaledHeight)
-      } else {
-        // No size specified, calculate bounding box
-        boundingBox.setFromObject(group).getSize(vec)
-        node.setWidth(scaledWidth || vec[mainAxis] * scaleFactor)
-        node.setHeight(scaledHeight || vec[crossAxis] * scaleFactor)
-      }
-    })
 
     // Perform yoga layout calculation
     node.calculateLayout(flexWidth * scaleFactor, flexHeight * scaleFactor, yogaDirection_)
